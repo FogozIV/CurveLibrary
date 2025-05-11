@@ -1,0 +1,17 @@
+{
+  "name": "CurveLibrary",
+  "version": "1.0.0",
+  "authors": "FogozIV",
+  "frameworks": "*",
+  "platforms": "*",
+  "dependencies": [
+    {
+      "name": "EurobotCoreMath",
+      "path": "lib/EurobotCoreMath"
+    }
+  ],
+  "build": {
+    "srcDir": "src",
+    "includeDir": "include"
+  }
+}
