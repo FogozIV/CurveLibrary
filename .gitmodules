@@ -1,0 +1,3 @@
+[submodule "lib/EurobotCoreMath"]
+	path = lib/EurobotCoreMath
+	url = git@github.com:FogozIV/TFECoreMath.git

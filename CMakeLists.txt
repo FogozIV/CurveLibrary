@@ -10,7 +10,7 @@ file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS include/*.h)
 add_library(CurveLibrary STATIC ${SOURCES} ${HEADERS})
 
 target_link_libraries(CurveLibrary
-        PRIVATE EurobotCoreMath
+        PUBLIC EurobotCoreMath
 )
 
 target_include_directories(CurveLibrary PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include)
