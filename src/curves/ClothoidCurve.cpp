@@ -230,8 +230,9 @@ std::optional<std::array<double, 2>> buildClothoid(Position begin, Position end,
 
     for (int i = 0; i < max_iter; ++i) {
         auto [current_error, current_dkappa] = computeError(L);
+#ifndef ARDUINO
         std::cout << "L: " << L << " Error: " << current_error << std::endl;
-
+#endif
         if (current_error < tolerance) {
             return std::array<double, 2>{current_dkappa, L};
         }

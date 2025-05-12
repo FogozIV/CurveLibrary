@@ -12,7 +12,7 @@
 #include <iterator>
 #endif
 // --- Generic 2x2 Matrix Solver (Ax = b) ---
-constexpr std::optional<std::array<double, 2>> solve2x2(const std::array<std::array<double, 2>, 2>& A, const std::array<double, 2>& b) {
+inline std::optional<std::array<double, 2>> solve2x2(const std::array<std::array<double, 2>, 2>& A, const std::array<double, 2>& b) {
     double det = A[0][0] * A[1][1] - A[0][1] * A[1][0];
     if (fabs(det) < 1e-10) return std::nullopt; // Singular matrix
 
@@ -20,7 +20,7 @@ constexpr std::optional<std::array<double, 2>> solve2x2(const std::array<std::ar
     double y = (A[0][0] * b[1] - A[1][0] * b[0]) / det;
     return std::array<double, 2>({x, y});
 }
-constexpr std::optional<std::array<double, 3>> solve3x3(const std::array<std::array<double, 3>,3>& A, std::array<double, 3> b) {
+inline std::optional<std::array<double, 3>> solve3x3(const std::array<std::array<double, 3>,3>& A, std::array<double, 3> b) {
     // LU decomposition (Crout's method)
     double LU[3][3];
     for (int i = 0; i < 3; ++i) {

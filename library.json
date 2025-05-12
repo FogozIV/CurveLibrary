@@ -1,13 +1,19 @@
 {
   "name": "CurveLibrary",
   "version": "1.0.0",
-  "authors": "FogozIV",
+  "authors": [
+    {
+      "name": "FogozIV",
+      "email": "-",
+      "maintainer": true
+    }
+  ],
   "frameworks": "*",
   "platforms": "*",
   "dependencies": [
     {
       "name": "EurobotCoreMath",
-      "path": "lib/EurobotCoreMath"
+      "url": "https://github.com/FogozIV/TFECoreMath.git"
     }
   ],
   "build": {
