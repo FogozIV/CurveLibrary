@@ -7,7 +7,7 @@
 #include <functional>
 #include <vector>
 // Implement the generalized RK4 method
-inline void runge_kutta_4(double t0, std::vector<double>& y0, double t_end, double h, std::function<void(double t, std::vector<double>& y, std::vector<double>& dydt)> f) {
+inline void runge_kutta_4(double& t0, std::vector<double>& y0, double t_end, double h, std::function<void(double t, std::vector<double>& y, std::vector<double>& dydt)> f) {
     double t = t0; // Current time
     int n = y0.size();
     std::vector<double> y(n);
@@ -57,6 +57,7 @@ inline void runge_kutta_4(double t0, std::vector<double>& y0, double t_end, doub
         // Update time
         t += h;
     }
+    t0 = t;
     y0.assign(y.begin(), y.end());
 }
 

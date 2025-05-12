@@ -4,6 +4,11 @@
 
 #include "curves/BezierCurve.h"
 
+#include <optional>
+#include <optional>
+#include <tuple>
+#include <tuple>
+
 BezierCurve::BezierCurve(Position pos1, Position pos2, Position pos3, Position pos4): BaseCurve(0, 1.0) {
     this->pos1 = pos1;
     this->pos2 = pos2;

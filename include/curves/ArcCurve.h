@@ -5,6 +5,11 @@
 #ifndef ARCCURVE_H
 #define ARCCURVE_H
 
+#include <optional>
+#include <optional>
+#include <tuple>
+#include <tuple>
+
 #include "BaseCurve.h"
 
 

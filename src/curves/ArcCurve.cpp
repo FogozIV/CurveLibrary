@@ -4,6 +4,11 @@
 
 #include "curves/ArcCurve.h"
 
+#include <optional>
+#include <optional>
+#include <tuple>
+#include <tuple>
+
 
 ArcCurve::ArcCurve(Position center, double radius, Angle angleStart, Angle angleEnd): BaseCurve(0, 1), center(center), radius(radius), angleStart(angleStart), angleEnd(angleEnd) {
 }

@@ -4,6 +4,11 @@
 
 #ifndef BEZIERCURVE_H
 #define BEZIERCURVE_H
+#include <optional>
+#include <optional>
+#include <tuple>
+#include <tuple>
+
 #include "BaseCurve.h"
 
 
