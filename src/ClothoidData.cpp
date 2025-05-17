@@ -33,8 +33,8 @@ int ClothoidData::build_G1(double const _x0, double const _y0, double const _the
     phi0 -= 2 * M_PI * round(phi0 / (2 * M_PI));
     phi1 -= 2 * M_PI * round(phi1 / (2 * M_PI));
 
-    WARP_ANGLE(phi0);
-    WARP_ANGLE(phi1);
+    phi0 = WARP_ANGLE(phi0);
+    phi1 = WARP_ANGLE(phi1);
 
     double delta = phi1 - phi0;
 
@@ -99,7 +99,7 @@ void ClothoidData::reverse(double L) {
     m_theta0 += L * (m_kappa0 + 0.5 * L * m_dk);
     m_kappa0 += L * m_dk;
     m_theta0 += M_PI;
-    WARP_ANGLE(m_theta0);
+    m_theta0 = WARP_ANGLE(m_theta0);
     m_kappa0 = -m_kappa0;
 }
 

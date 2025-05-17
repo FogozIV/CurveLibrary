@@ -216,8 +216,8 @@ int G2Solve3Arc::build(double x0, double y0, double theta0, double kappa0, doubl
     m_th1 = m_theta1 - m_phi;
 
     // put in range
-    WARP_ANGLE(m_th0);
-    WARP_ANGLE(m_th1);
+    m_th0 = WARP_ANGLE(m_th0);
+    m_th1 = WARP_ANGLE(m_th1);
 
     m_K0 = (m_kappa0 / m_Lscale); // k0
     m_K1 = (m_kappa1 / m_Lscale); // k1
@@ -307,8 +307,8 @@ int G2Solve3Arc::build_fixed_length(double s0, double x0, double y0, double thet
     m_th1 = m_theta1 - m_phi;
 
     // put in range
-    WARP_ANGLE(m_th0);
-    WARP_ANGLE(m_th1);
+    m_th0 = WARP_ANGLE(m_th0);
+    m_th1 = WARP_ANGLE(m_th1);
 
     m_K0 = (m_kappa0 / m_Lscale); // k0
     m_K1 = (m_kappa1 / m_Lscale); // k1
