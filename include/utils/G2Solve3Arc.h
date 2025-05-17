@@ -10,37 +10,6 @@
 #include "ClothoidData.h"
 #include "utils/Position.h"
 
-struct ClothoidSegment {
-    double x = 0;
-    double y = 0;
-    double theta = 0;
-    double kappa = 0;
-    double dkappa = 0;
-    double length = 0;
-    bool initialized = false;
-
-    ClothoidSegment(double x=0, double y=0, double theta=0, double kappa=0, double dkappa=0, double length=0)
-        : x(x),
-          y(y),
-          theta(theta),
-          kappa(kappa),
-          dkappa(dkappa),
-          length(length), initialized(true) {
-    }
-};
-#ifndef ARDUINO
-#include <iostream>
-
-inline std::ostream& operator<<(std::ostream& os, const ClothoidSegment& segment) {
-    os << "x: " << segment.x << " y: " << segment.y << " theta: " << segment.theta << " kappa: " << segment.kappa
-       << " dkappa: " << segment.dkappa << " length: " << segment.length;
-    return os;
-}
-
-#endif
-
-
-
 class G2Solve3Arc {
     ClothoidCurveV2 m_segment0, m_segment1, m_segmentM;
     double m_tolerance = 1e-10;
