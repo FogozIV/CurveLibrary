@@ -20,7 +20,7 @@ public:
 
     // Add a curve and update total arc length
     void addCurve(const std::shared_ptr<BaseCurve>& curve) {
-        if (!curve) throw std::invalid_argument("Null curve provided");
+        if (!curve) return;
         curves.push_back(curve);
 
         // Update min/max parametric values (summed for the list)
@@ -36,6 +36,7 @@ public:
     // --- Required BaseCurve overrides ---
     Position getPosition(double value, double h = 0.01) override {
         auto [curve, local_arc_length] = _getCurveAtArcLength(value);
+        if (curve == nullptr) return Position();  // No curve found for the given value
         double parametric_value = curve->getValueForLength(
             curve->getMinValue(),
             local_arc_length,
@@ -46,6 +47,7 @@ public:
 
     Position getDerivative(double value) override {
         auto [curve, local_arc_length] = _getCurveAtArcLength(value);
+        if (curve == nullptr) return Position();  // No curve found for the given value
         double parametric_value = curve->getValueForLength(
             curve->getMinValue(),
             local_arc_length,
@@ -68,7 +70,9 @@ public:
 
     // --- Helper methods ---
     std::pair<std::shared_ptr<BaseCurve>, double> _getCurveAtArcLength(double arc_length) {
-        if (curves.empty()) throw std::runtime_error("CurveList is empty");
+        if (curves.empty()) {
+            return {nullptr, 0.0};  // No curves in the list
+        }
         arc_length = std::clamp(arc_length, minValue, maxValue);
 
         // Binary search for O(log N) lookup
@@ -77,7 +81,7 @@ public:
         if (segment_idx >= curves.size()) segment_idx = curves.size() - 1;
 
         double segment_start = (segment_idx == 0) ? 0.0 : segment_arc_lengths[segment_idx - 1];
-        return {curves[segment_idx], arc_length - segment_start};
+        return std::pair{curves[segment_idx], arc_length - segment_start};
     }
 };
 #endif //CURVELIST_H
