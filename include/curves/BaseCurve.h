@@ -23,9 +23,9 @@ public:
 
     virtual Position getDerivative(double value) = 0; //not const in case we buffer like in the clothoid
 
-    double getMinValue() const;
+    virtual double getMinValue() const;
 
-    double getMaxValue() const;
+    virtual double getMaxValue() const;
 
     virtual double getLength(const double h=0.01);
 
