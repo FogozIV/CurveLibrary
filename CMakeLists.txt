@@ -8,7 +8,7 @@ file(GLOB_RECURSE SOURCES CONFIGURE_DEPENDS src/*.cpp)
 file(GLOB_RECURSE HEADERS CONFIGURE_DEPENDS include/*.h)
 
 add_library(CurveLibrary STATIC ${SOURCES} ${HEADERS})
-
+target_compile_definitions(CurveLibrary PUBLIC ENABLE_CURVATURE_POS=1)
 target_link_libraries(CurveLibrary
         PUBLIC EurobotCoreMath
 )

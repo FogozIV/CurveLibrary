@@ -5,7 +5,8 @@
 #include "curves/ClothoidCurve.h"
 
 #include <tuple>
-#include "utils/Solver.h"
+
+#include "utils/G2Solve3Arc.h"
 
 ClothoidCurve::ClothoidCurve(Position start, double startCurvature, double curvatureRate,
                              double length) : BaseCurve(0, length), start(start), startCurvature(startCurvature),
@@ -18,6 +19,30 @@ ClothoidCurve::ClothoidCurve(Position start, double initialCurvature, std::array
 
 ClothoidCurve::ClothoidCurve(Position start, std::array<double, 3> kcl) : ClothoidCurve(start, kcl[0], kcl[1], kcl[2]) {
 }
+
+ClothoidCurve::ClothoidCurve(const ClothoidSegmentOld &segment) : BaseCurve(0, segment.length){
+    start = Position::from(segment.xy);
+    start.add(0,0,Angle::fromRadians(segment.theta));
+    startCurvature = segment.kappa;
+    curvatureRate = segment.dkappa;
+    length = segment.length;
+}
+
+ClothoidCurve::ClothoidCurve(const ClothoidSegment &segment): BaseCurve(0, segment.length) {
+    start = Position(segment.x, segment.y, Angle::fromRadians(segment.theta));
+    startCurvature = segment.kappa;
+    curvatureRate = segment.dkappa;
+    length = segment.length;
+}
+
+ClothoidCurve::ClothoidCurve(ClothoidCurveV2 curve) : BaseCurve(0, curve.length()) {
+    start = Position(curve.m_CD.m_x0, curve.m_CD.m_y0, Angle::fromRadians(curve.m_CD.m_theta0));
+    startCurvature = curve.m_CD.m_kappa0;
+    curvatureRate = curve.m_CD.m_dk;
+    length = curve.length();
+    this->curve = curve;
+}
+
 
 std::shared_ptr<ClothoidCurve> ClothoidCurve::getClothoidCurve(Position start, Angle endAngle, double initialCurvature,
                                                                double length) {
@@ -88,7 +113,11 @@ Position ClothoidCurve::getPosition(double value, double h) {
     auto pos = Position(start.getX() + rotatedX, start.getY() + rotatedY, Angle::fromRadians(y[2]));
     */
     auto pos = localToGlobal(local);
+#ifdef ENABLE_CURVATURE_POS
+    return {pos.getX(), pos.getY(), pos.getAngle(), this->startCurvature + this->curvatureRate * value};
+#else
     return pos;
+#endif
 }
 
 void ClothoidCurve::clothoidODE(double t, std::vector<double> &y, std::vector<double> &dydt) const {
@@ -101,12 +130,14 @@ void ClothoidCurve::clothoidODE(double t, std::vector<double> &y, std::vector<do
 
 Position ClothoidCurve::getDerivative(double value) {
     std::vector<double> y(3), dydt(3);
-    Position pos = getPosition(value, 0.01); // small step
-    double angle = pos.getAngle().toRadians();
+    double angle = start.getAngle().toRadians() + startCurvature * value + 0.5 * curvatureRate * value * value;
 
     double current_curvature = startCurvature + curvatureRate * value;
-
+#ifdef ENABLE_CURVATURE_POS
+    return {cos(angle), sin(angle), Angle::fromRadians(current_curvature), curvatureRate};
+#else
     return {cos(angle), sin(angle), Angle::fromRadians(current_curvature)};
+#endif
 }
 
 double ClothoidCurve::getLength(double ti, double t_end, double h) {
@@ -117,7 +148,7 @@ double ClothoidCurve::getValueForLength(double ti, double length, double h) {
     return std::min(ti + length, this->length);
 }
 
-double integralXk(double a, double b, double c, double k=0, double h=0.001) {
+double integralXk(double a, double b, double c, double k, double h) {
     double t0 = 0.0;
     std::vector<double> y = {0};
     runge_kutta_4(t0, y, 1, h, [a,b,c, k](double t, std::vector<double> &y, std::vector<double> &dydt) {
@@ -125,7 +156,7 @@ double integralXk(double a, double b, double c, double k=0, double h=0.001) {
     });
     return y[0];
 }
-double integralYk(double a, double b, double c, double k=0, double h=0.001) {
+double integralYk(double a, double b, double c, double k, double h) {
     double t0 = 0.0;
     std::vector<double> y = {0};
     runge_kutta_4(t0, y, 1, h, [a,b,c,k](double t, std::vector<double> &y, std::vector<double> &dydt) {
@@ -188,93 +219,4 @@ std::optional<std::array<double, 3>> buildClothoid(Position begin, Position end)
     dkappa = (2 * A / (L * L));
 
     return std::array<double, 3>({kappa, dkappa, L});
-}
-
-std::optional<std::array<double, 2>> buildClothoid(Position begin, Position end, double kappa0) {
-    // Step 1: Convert to relative coordinates
-    auto dPos = end - begin;
-    double dx = dPos.getX();
-    double dy = dPos.getY();
-    auto theta0 = begin.getAngle();
-    auto theta1 = end.getAngle();
-    double r = hypot(dx, dy);
-    Angle phi = Angle::fromRadians(atan2(dy, dx));
-
-    // Step 2: Normalize angles relative to phi
-    auto phi0 = (theta0 - phi).warpAngle().toRadians();
-    auto phi1 = (theta1 - phi).warpAngle().toRadians();
-    auto delta = (phi1 - phi0);
-
-
-    auto computeError = [=](double L)->std::pair<double, double> {
-        double dkappa = 2 * (delta - kappa0 * L) / (L * L);
-
-        double X = integralXk(dkappa * L * L, kappa0 * L, phi0);
-        double Y = integralYk(dkappa * L * L, kappa0 * L, phi0);
-
-        double x_err = X * L - r;
-        double y_err = Y * L;
-        return {hypot(x_err, y_err), dkappa};
-    };
-
-    // Step 4: Initial guess for A
-    auto L_min = 1e-6; // Simple initial guess
-    auto L_max = 2300;
-    double L = r;
-
-    // Step 5: Hybrid root finding (combination of bisection and Newton)
-    double tolerance = 1e-10;
-    int max_iter = 1000;
-    double error = 0;
-    double dkappa = 0;
-
-    for (int i = 0; i < max_iter; ++i) {
-        auto [current_error, current_dkappa] = computeError(L);
-#ifndef ARDUINO
-        std::cout << "L: " << L << " Error: " << current_error << std::endl;
-#endif
-        if (current_error < tolerance) {
-            return std::array<double, 2>{current_dkappa, L};
-        }
-
-        // Try Newton step
-        double h = std::max(L * 1e-4, 1e-8);
-        auto [error_plus, _] = computeError(L + h);
-        auto [error_minus, __] = computeError(L - h);
-
-        double derivative = (error_plus - error_minus) / (2 * h);
-
-        if (std::abs(derivative) > 1e-15) {
-            double L_new = L - 0.5 * current_error / derivative;
-            // Keep within bounds
-            if (L_new > L_min && L_new < L_max) {
-                L = L_new;
-                continue;
-            }
-        }
-
-        // Fall back to bisection if Newton fails
-        auto err_low = computeError(L_min);
-        auto err_high = computeError(L_max);
-
-        if (err_low.first * err_high.first > 0) {
-            // No solution in interval
-            break;
-        }
-
-        L = (L_min + L_max) / 2;
-        auto [mid_err, mid_dkappa] = computeError(L);
-
-        if (mid_err < tolerance) {
-            return std::array<double, 2>{mid_dkappa, L};
-        }
-
-        if (mid_err * err_low.first < 0) {
-            L_max = L;
-        } else {
-            L_min = L;
-        }
-    }
-
-    return std::nullopt;
 }
