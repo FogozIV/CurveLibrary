@@ -4,7 +4,7 @@
 
 #include "../include/utils/Solver2x2.h"
 
-#include <math.h>
+#include <cmath>
 
 bool
   Solve2x2::factorize( double A[2][2] ) {

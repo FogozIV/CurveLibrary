@@ -1,11 +1,14 @@
 //
 // Created by fogoz on 16/05/2025.
 //
-
+#define _USE_MATH_DEFINES
 #ifndef FRESNEL_H
 #define FRESNEL_H
 #include <cASSERT>
 #include <cmath>
+#ifndef M_PI
+#include <corecrt_math_defines.h>
+#endif
 
 #ifdef ARDUINO
 #ifndef ASSERT
