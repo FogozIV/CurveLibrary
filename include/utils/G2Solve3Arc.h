@@ -6,10 +6,11 @@
 #define G2SOLVE3ARC_H
 
 #include <cmath>
+#include <memory>
 
 #include "ClothoidData.h"
 #include "utils/Position.h"
-
+class ClothoidCurve;
 class G2Solve3Arc {
     ClothoidCurveV2 m_segment0, m_segment1, m_segmentM;
     double m_tolerance = 1e-10;
@@ -67,6 +68,12 @@ public:
     [[nodiscard]] ClothoidCurveV2 getSegmentMiddle() const {
         return m_segmentM;
     }
+
+    std::shared_ptr<ClothoidCurve> getSegment0Curve() const;
+
+    std::shared_ptr<ClothoidCurve> getSegment1Curve() const;
+
+    std::shared_ptr<ClothoidCurve> getSegmentMiddleCurve() const;
 
     void reverse();
 };

@@ -352,6 +352,18 @@ int G2Solve3Arc::build_fixed_length(double s0, double x0, double y0, double thet
     return solve(L, thM);
 }
 
+std::shared_ptr<ClothoidCurve> G2Solve3Arc::getSegment0Curve() const {
+    return std::make_shared<ClothoidCurve>(m_segment0);
+}
+
+std::shared_ptr<ClothoidCurve> G2Solve3Arc::getSegment1Curve() const {
+    return std::make_shared<ClothoidCurve>(m_segment1);
+}
+
+std::shared_ptr<ClothoidCurve> G2Solve3Arc::getSegmentMiddleCurve() const {
+    return std::make_shared<ClothoidCurve>(m_segmentM);
+}
+
 void G2Solve3Arc::reverse() {
     std::swap(m_segment0, m_segment1);
     m_segmentM.reverse();
