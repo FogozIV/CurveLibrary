@@ -5,6 +5,7 @@
 #include "../include/utils/G2Solve3Arc.h"
 
 #include "curves/ClothoidCurve.h"
+#include "curves/CurveList.h"
 #include "utils/Angle.h"
 #include "utils/ClothoidData.h"
 #include "utils/Fresnel.h"
@@ -362,6 +363,14 @@ std::shared_ptr<ClothoidCurve> G2Solve3Arc::getSegment1Curve() const {
 
 std::shared_ptr<ClothoidCurve> G2Solve3Arc::getSegmentMiddleCurve() const {
     return std::make_shared<ClothoidCurve>(m_segmentM);
+}
+
+std::shared_ptr<CurveList> G2Solve3Arc::getCurveList() const {
+    auto list = std::make_shared<CurveList>();
+    list->addCurve(getSegment0Curve());
+    list->addCurve(getSegmentMiddleCurve());
+    list->addCurve(getSegment1Curve());
+    return list;
 }
 
 void G2Solve3Arc::reverse() {

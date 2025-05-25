@@ -32,6 +32,11 @@ public:
         );
         segment_arc_lengths.push_back(total_arc_length);
     }
+    void addCurveList(const std::shared_ptr<CurveList> list) {
+        for (auto& curve : list->curves) {
+            addCurve(curve);
+        }
+    }
 
     // --- Required BaseCurve overrides ---
     Position getPosition(double value, double h = 0.01) override {

@@ -11,6 +11,7 @@
 #include "ClothoidData.h"
 #include "utils/Position.h"
 class ClothoidCurve;
+class CurveList;
 class G2Solve3Arc {
     ClothoidCurveV2 m_segment0, m_segment1, m_segmentM;
     double m_tolerance = 1e-10;
@@ -74,6 +75,8 @@ public:
     std::shared_ptr<ClothoidCurve> getSegment1Curve() const;
 
     std::shared_ptr<ClothoidCurve> getSegmentMiddleCurve() const;
+
+    std::shared_ptr<CurveList> getCurveList() const;
 
     void reverse();
 };
