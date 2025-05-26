@@ -57,12 +57,9 @@ Position BezierCurve::getDerivative(double value) {
     double curvature_derivative = ((ddx * dddy - ddy * dddx) * (dx * dx + dy * dy) -
                                    3 * (dx * ddy - dy * ddx) * (dx * ddx + dy * ddy)) /
                                   pow(dx * dx + dy * dy, 3);
-#ifdef ENABLE_CURVATURE_POS
+
     double curvature = headingDerivative / sqrt(dx * dx + dy * dy); // Optional: if you want curvature
     return {dx, dy, Angle::fromRadians(headingDerivative), curvature_derivative};
-#else
-    return Position(dx, dy, Angle::fromRadians(headingDerivative));
-#endif
 }
 
 Position BezierCurve::getSecondDerivative(double value) {
