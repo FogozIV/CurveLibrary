@@ -20,11 +20,7 @@ Position ArcCurve::getPosition(double value, double h) {
     double diff = (angleEnd - angleStart).warpAngle().toDegrees();
     bool isCCW = diff > 0;
     double orientation = angle + (isCCW ? M_PI/2 : -M_PI/2);
-#ifdef ENABLE_CURVATURE_POS
     return Position(x, y, Angle::fromRadians(orientation), 1/radius);
-#else
-    return {x, y, Angle::fromRadians(orientation)};//Angle not used
-#endif
 }
 
 Position ArcCurve::getDerivative(double value) {
@@ -35,18 +31,13 @@ Position ArcCurve::getDerivative(double value) {
 
     double dx = -radius * sin(angle) * dAngle;
     double dy =  radius * cos(angle) * dAngle;
-    double heading = atan2(dy, dx);
 
     // Heading derivative θ' = curvature * speed
     double speed = std::sqrt(dx*dx + dy*dy); // ||v||
     double curvature = (radius == 0.0) ? 0.0 : 1.0 / radius;
     double headingDerivative = curvature * speed;
 
-#ifdef ENABLE_CURVATURE_POS
     return Position(dx, dy, Angle::fromRadians(headingDerivative), 0.0);
-#else
-    return {dx, dy, Angle::fromRadians(headingDerivative)};
-#endif
 }
 
 std::optional<ArcCurve> getArcCurve(Position begin, Position end, bool backward) {

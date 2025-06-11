@@ -8,12 +8,13 @@
 #include <optional>
 #include <tuple>
 #include <tuple>
+#include <utility>
 
 BezierCurve::BezierCurve(Position pos1, Position pos2, Position pos3, Position pos4, bool reversed): BaseCurve(0, 1.0), reversed(reversed) {
-    this->pos1 = pos1;
-    this->pos2 = pos2;
-    this->pos3 = pos3;
-    this->pos4 = pos4;
+    this->pos1 = std::move(pos1);
+    this->pos2 = std::move(pos2);
+    this->pos3 = std::move(pos3);
+    this->pos4 = std::move(pos4);
 }
 
 Position BezierCurve::getPosition(double value, double h) {
@@ -23,11 +24,8 @@ Position BezierCurve::getPosition(double value, double h) {
     Position result =  pos1 * pow(1-value, 3) + pos2 * (3*pow(1-value, 2)*value) + pos3 * (3*(1-value)*pow(value, 2)) + pos4 * pow(value, 3);
     Position derivative = getDerivative(value);
     Position secondDerivative = getSecondDerivative(value);
-#ifdef ENABLE_CURVATURE_POS
     return {result.getX(), result.getY(), Angle::fromRadians(atan2(derivative.getY(), derivative.getX())), (derivative.getX() * secondDerivative.getY() - derivative.getY() * secondDerivative.getX() ) / pow((pow(derivative.getX(), 2) + pow(derivative.getY(), 2)), 3.0/2.0)};
-#else
-    return {result.getX(), result.getY(), Angle::fromRadians(atan2(derivative.getY(), derivative.getX()))};
-#endif
+
 }
 
 Position BezierCurve::getDerivative(double value) {
@@ -50,19 +48,12 @@ Position BezierCurve::getDerivative(double value) {
     double dddx = thirdDerivative.getX();
     double dddy = thirdDerivative.getY();
 
-    double heading = atan2(dy, dx);
-
     // θ' = (x' y'' - y' x'') / (x'^2 + y'^2)
     double headingDerivative = (dx * ddy - dy * ddx) / (dx * dx + dy * dy);
     double curvature_derivative = ((ddx * dddy - ddy * dddx) * (dx * dx + dy * dy) -
                                    3 * (dx * ddy - dy * ddx) * (dx * ddx + dy * ddy)) /
                                   pow(dx * dx + dy * dy, 3);
-#ifdef ENABLE_CURVATURE_POS
-    double curvature = headingDerivative / sqrt(dx * dx + dy * dy); // Optional: if you want curvature
     return {dx, dy, Angle::fromRadians(headingDerivative), curvature_derivative};
-#else
-    return Position(dx, dy, Angle::fromRadians(headingDerivative));
-#endif
 }
 
 Position BezierCurve::getSecondDerivative(double value) {
