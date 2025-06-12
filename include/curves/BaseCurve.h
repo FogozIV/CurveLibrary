@@ -37,6 +37,10 @@ public:
 
     virtual bool isBackward();
 
+    virtual Position getLastPosition() {
+        return getPosition(getMaxValue());
+    }
+
 };
 
 
