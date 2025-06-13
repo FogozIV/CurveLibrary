@@ -53,6 +53,36 @@ double BaseCurve::findNearest(Position pos, double h) {
     return index;
 }
 
+double BaseCurve::findNearest(Position pos, double guess, double h, int maxIter, double t_min, double t_max) {
+    double bestT = guess;
+    double bestDist = (getPosition(bestT) - pos).getDistance();
+
+    for (int i = 0; i < maxIter; ++i) {
+        double t_left = bestT - h;
+        double t_right = bestT + h;
+
+        // Clamp within bounds
+        t_left = std::max(std::max(t_left, minValue), t_min);
+        t_right = std::max(std::min(t_right, maxValue), t_max);
+
+        double d_left = (getPosition(t_left) - pos).getDistance();
+        double d_right = (getPosition(t_right) - pos).getDistance();
+
+        if (d_left < bestDist) {
+            bestT = t_left;
+            bestDist = d_left;
+        } else if (d_right < bestDist) {
+            bestT = t_right;
+            bestDist = d_right;
+        } else {
+            // Neither side is better: we are at local min
+            break;
+        }
+    }
+
+    return bestT;
+}
+
 bool BaseCurve::isBackward() {
     return backward;
 }

@@ -35,6 +35,8 @@ public:
 
     double findNearest(Position pos, double h);
 
+    double findNearest(Position pos, double guess, double h, int maxIter, double t_min, double t_max);
+
     virtual bool isBackward();
 
     virtual Position getLastPosition() {
