@@ -4,7 +4,7 @@
 #define _USE_MATH_DEFINES
 #ifndef FRESNEL_H
 #define FRESNEL_H
-#include <cASSERT>
+#include <cassert>
 #include <cmath>
 #ifndef M_PI
 #include <corecrt_math_defines.h>
