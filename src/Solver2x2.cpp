@@ -10,15 +10,15 @@
 bool
   Solve2x2::factorize( double A[2][2] ) {
     // full pivoting
-    double Amax = abs(A[0][0]);
-    double tmp  = abs(A[0][1]);
+    double Amax = fabs(A[0][0]);
+    double tmp  = fabs(A[0][1]);
     int   ij{0};
     if ( tmp > Amax ) { ij = 1; Amax = tmp; }
-    tmp = abs(A[1][0]);
+    tmp = fabs(A[1][0]);
     if ( tmp > Amax ) { ij = 2; Amax = tmp; }
-    tmp = abs(A[1][1]);
+    tmp = fabs(A[1][1]);
     if ( tmp > Amax ) { ij = 3; Amax = tmp; }
-    if ( abs(Amax) < 1e-8) return false;
+    if ( fabs(Amax) < 1e-8) return false;
     if ( (ij&0x01) == 0x01 ) { j[0] = 1; j[1] = 0; }
     else                     { j[0] = 0; j[1] = 1; }
     if ( (ij&0x02) == 0x02 ) { i[0] = 1; i[1] = 0; }
@@ -32,7 +32,7 @@ bool
     LU[1][0] /= LU[0][0];
     LU[1][1] -= LU[1][0]*LU[0][1];
     // check for singularity
-    singular = abs( LU[1][1] ) < epsi;
+    singular = fabs( LU[1][1] ) < epsi;
     return true;
   }
 

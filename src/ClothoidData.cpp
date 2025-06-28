@@ -55,8 +55,8 @@ int ClothoidData::build_G1(double const _x0, double const _y0, double const _the
         g = intS[0];
         double const dg{intC[2] - intC[1]};
         A -= g / dg;
-    } while (++niter <= 100 && abs(g) > tol);
-    ASSERT(abs(g) <= tol, -1);
+    } while (++niter <= 100 && fabs(g) > tol);
+    ASSERT(fabs(g) <= tol, -1);
     GeneralizedFresnelCS(2 * A, delta - A, phi0, intC[0], intS[0]);
     L = r / intC[0];
 

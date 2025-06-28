@@ -7,6 +7,7 @@
 
 #include <cmath>
 #include <memory>
+#include <math.h>
 
 #include "ClothoidData.h"
 #include "utils/Position.h"

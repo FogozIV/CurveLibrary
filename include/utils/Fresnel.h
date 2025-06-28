@@ -6,6 +6,7 @@
 #define FRESNEL_H
 #include <cassert>
 #include <cmath>
+#include <math.h>
 #ifndef M_PI
 #include <corecrt_math_defines.h>
 #endif
@@ -129,7 +130,7 @@ static void FresnelCS(double y, double &C, double &S) {
             numterm *= t;
             term = numterm / (fact * denterm);
             sum += term;
-        } while (abs(term) > eps * abs(sum));
+        } while (fabs(term) > eps * fabs(sum));
 
         C = x * sum;
 
@@ -146,7 +147,7 @@ static void FresnelCS(double y, double &C, double &S) {
             numterm *= t;
             term = numterm / (fact * denterm);
             sum += term;
-        } while (abs(term) > eps * abs(sum));
+        } while (fabs(term) > eps * fabs(sum));
 
         S = M_PI_2 * sum * (x * x * x);
     } else if (x < 6.0) {
@@ -194,7 +195,7 @@ static void FresnelCS(double y, double &C, double &S) {
             absterm = abs(term);
             ASSERT(oldterm >= absterm,);
             oldterm = absterm;
-        } while (absterm > eps10 * abs(sum));
+        } while (absterm > eps10 * fabs(sum));
 
         double const f{sum / (M_PI * x)};
 
@@ -211,7 +212,7 @@ static void FresnelCS(double y, double &C, double &S) {
             absterm = abs(term);
             ASSERT(oldterm >= absterm,);
             oldterm = absterm;
-        } while (absterm > eps10 * abs(sum));
+        } while (absterm > eps10 * fabs(sum));
 
         double g{M_PI * x};
         g = sum / (g * g * x);
@@ -244,7 +245,7 @@ static void FresnelCS(int const nk, double const t, double C[], double S[]) {
 
 static void evalXYaLarge(double const a, double const b, double &X, double &Y) {
     double const s = a > 0 ? +1 : -1;
-    double const absa = abs(a);
+    double const absa = fabs(a);
     double const z = m_1_sqrt_pi * sqrt(absa);
     double const ell = s * b * m_1_sqrt_pi / sqrt(absa);
     double const g = -0.5 * s * (b * b) / absa;
@@ -268,7 +269,7 @@ static void evalXYaLarge(int const nk, double const a, double const b, double X[
     ASSERT(nk < 4 && nk > 0,);
 
     double const s{static_cast<double>(a > 0 ? +1 : -1)};
-    double const absa{abs(a)};
+    double const absa{fabs(a)};
     double const z{m_1_sqrt_pi * sqrt(absa)};
     double const ell{s * b * m_1_sqrt_pi / sqrt(absa)};
     double const g{-0.5 * s * (b * b) / absa};
@@ -312,7 +313,7 @@ static double LommelReduced(double const mu, double const nu, double const b) {
     for (int n = 1; n <= 100; ++n) {
         tmp *= (-b / (2 * n + mu - nu + 1)) * (b / (2 * n + mu + nu + 1));
         res += tmp;
-        if (abs(tmp) < abs(res) * 1e-50) break;
+        if (fabs(tmp) < fabs(res) * 1e-50) break;
     }
     return res;
 }
@@ -321,7 +322,7 @@ static void evalXYazero(int const nk, double const b, double X[], double Y[]) {
     double const sb{sin(b)};
     double const cb{cos(b)};
     double const b2{b * b};
-    if (abs(b) < 1e-3) {
+    if (fabs(b) < 1e-3) {
         X[0] = 1 - (b2 / 6) * (1 - (b2 / 20) * (1 - (b2 / 42)));
         Y[0] = (b / 2) * (1 - (b2 / 12) * (1 - (b2 / 30)));
     } else {
@@ -411,7 +412,7 @@ static void evalXYaSmall(int const nk, double const a, double const b, int const
 static void GeneralizedFresnelCS(int const nk, double const a, double const b, double const c, double intC[],
                                  double intS[]) {
     ASSERT(nk > 0 && nk < 4,);
-    if (abs(a) < A_THRESHOLD) {
+    if (fabs(a) < A_THRESHOLD) {
         evalXYaSmall(nk, a, b, A_SERIE_SIZE, intC, intS);
     } else {
         evalXYaLarge(nk, a, b, intC, intS);
@@ -428,7 +429,7 @@ static void GeneralizedFresnelCS(int const nk, double const a, double const b, d
 
 static void GeneralizedFresnelCS(double const a, double const b, double const c, double &intC, double &intS) {
     double xx{}, yy{};
-    if (abs(a) < A_THRESHOLD) evalXYaSmall(a, b, A_SERIE_SIZE, xx, yy);
+    if (fabs(a) < A_THRESHOLD) evalXYaSmall(a, b, A_SERIE_SIZE, xx, yy);
     else evalXYaLarge(a, b, xx, yy);
 
     double const cosc{cos(c)};
