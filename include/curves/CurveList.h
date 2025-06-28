@@ -37,6 +37,9 @@ public:
             addCurve(curve);
         }
     }
+    size_t getCurveCount(){
+        return curves.size();
+    }
 
     // --- Required BaseCurve overrides ---
     Position getPosition(double value, double h = 0.01) override {
