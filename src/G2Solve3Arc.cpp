@@ -2,7 +2,7 @@
 // Created by fogoz on 16/05/2025.
 //
 
-#include "../include/utils/G2Solve3Arc.h"
+#include <utils/G2Solve3Arc.h>
 
 #include "curves/ClothoidCurve.h"
 #include "curves/CurveList.h"
@@ -11,6 +11,10 @@
 #include "utils/Fresnel.h"
 #include "utils/Solver2x2.h"
 #define MATRIX_MODE 1
+
+#ifdef F
+#undef F
+#endif
 #if MATRIX_MODE == 0
 void G2Solve3Arc::evalFJ(double const vars[2], double F[2], double J[2][2]) {
     double const sM{vars[0]};
