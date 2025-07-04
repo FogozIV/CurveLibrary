@@ -43,6 +43,8 @@ class G2Solve3Arc {
 
     void evalFJ(double const vars[2], double F[2], double J[2][2]);
 
+    void evalFJ(const Matrix<2,1>& vars, Matrix<2,1>& F, Matrix<2,2>& J);
+
     void evalF(double const vars[2], double F[2]);
 
     void buildSolution(double sM, double thM);

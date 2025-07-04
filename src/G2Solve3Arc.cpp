@@ -10,8 +10,8 @@
 #include "utils/ClothoidData.h"
 #include "utils/Fresnel.h"
 #include "utils/Solver2x2.h"
-
-
+#define MATRIX_MODE 1
+#if MATRIX_MODE == 0
 void G2Solve3Arc::evalFJ(double const vars[2], double F[2], double J[2][2]) {
     double const sM{vars[0]};
     double const thM{vars[1]};
@@ -69,7 +69,65 @@ void G2Solve3Arc::evalFJ(double const vars[2], double F[2], double J[2][2]) {
     J[1][0] = f4 * dK0_sM + f5 * dK1_sM + f6 * dKM_sM + f7 * KM_sM + t1;
     J[1][1] = f4 * dK0_thM + f5 * dK1_thM + f6 * dKM_thM + f7 * KM_thM + sM * t0;
 }
+#else
+void G2Solve3Arc::evalFJ(const Matrix<2, 1> &vars, Matrix<2, 1> &F, Matrix<2, 2> &J) {
+    double const sM{vars(0, 0)};
+    double const thM{vars(1,0)};
 
+    double const dsM{1.0 / (m_c13 + (m_c14 + sM) * sM)};
+    double const dsMsM{dsM * sM};
+    double const dK0{dsM * (m_c0 * thM + sM * (m_c1 * thM + m_c2 - sM * m_K0) + m_c3)};
+    double const dK1{dsM * (m_c0 * thM + sM * (m_c4 * thM + m_c5 + sM * m_K1) + m_c6)};
+    double const dKM{dsMsM * (thM * (m_c7 - 2 * sM) + m_c8 * sM + m_c9)};
+    double const KM{dsMsM * (m_c10 * thM + m_c11 * sM + m_c12)};
+
+    double X0[3], Y0[3],
+            X1[3], Y1[3],
+            XMp[3], YMp[3],
+            XMm[3], YMm[3];
+    GeneralizedFresnelCS(3, dK0, m_K0, m_th0, X0, Y0);
+    GeneralizedFresnelCS(3, dK1, -m_K1, m_th1, X1, Y1);
+    GeneralizedFresnelCS(3, dKM, KM, thM, XMp, YMp);
+    GeneralizedFresnelCS(3, dKM, -KM, thM, XMm, YMm);
+
+    // in the standard problem dx = 2, dy = 0
+    double const t0{XMp[0] + XMm[0]};
+    double const t1{YMp[0] + YMm[0]};
+    F(0,0) = m_s0 * X0[0] + m_s1 * X1[0] + sM * t0 - 2;
+    F(1,0) = m_s0 * Y0[0] + m_s1 * Y1[0] + sM * t1 - 0;
+
+    // calcolo J(F)
+    double const dsM2{dsM * dsM};
+    double const g0{-(2 * sM + m_c14) * dsM2};
+    double const g1{(m_c13 - sM * sM) * dsM2};
+    double const g2{sM * (sM * m_c14 + 2 * m_c13) * dsM2};
+
+    double const dK0_sM{(m_c0 * thM + m_c3) * g0 + (m_c1 * thM + m_c2) * g1 - m_K0 * g2};
+    double const dK1_sM{(m_c0 * thM + m_c6) * g0 + (m_c4 * thM + m_c5) * g1 + m_K1 * g2};
+    double const dKM_sM{(m_c7 * thM + m_c9) * g1 + (m_c8 - 2 * thM) * g2};
+    double const KM_sM{(m_c10 * thM + m_c12) * g1 + m_c11 * g2};
+
+    double const dK0_thM{(m_c0 + m_c1 * sM) * dsM};
+    double const dK1_thM{(m_c0 + m_c4 * sM) * dsM};
+    double const dKM_thM{(m_c7 - 2 * sM) * dsMsM};
+    double const KM_thM{m_c10 * dsMsM};
+
+    // coeff fresnel per f_j per lo jacobiano
+    double const f0{-0.5 * m_s0 * Y0[2]};
+    double const f1{-0.5 * m_s1 * Y1[2]};
+    double const f2{-0.5 * sM * (YMm[2] + YMp[2])};
+    double const f3{sM * (YMm[1] - YMp[1])};
+    double const f4{0.5 * m_s0 * X0[2]};
+    double const f5{0.5 * m_s1 * X1[2]};
+    double const f6{0.5 * sM * (XMm[2] + XMp[2])};
+    double const f7{sM * (XMp[1] - XMm[1])};
+
+    J(0,0) = f0 * dK0_sM + f1 * dK1_sM + f2 * dKM_sM + f3 * KM_sM + t0;
+    J(0,1) = f0 * dK0_thM + f1 * dK1_thM + f2 * dKM_thM + f3 * KM_thM - sM * t1;
+    J(1,0) = f4 * dK0_sM + f5 * dK1_sM + f6 * dKM_sM + f7 * KM_sM + t1;
+    J(1,1) = f4 * dK0_thM + f5 * dK1_thM + f6 * dKM_thM + f7 * KM_thM + sM * t0;
+}
+#endif
 void G2Solve3Arc::evalF(double const vars[2], double F[2]) {
     double const sM{vars[0]};
     double const thM{vars[1]};
@@ -136,56 +194,61 @@ void G2Solve3Arc::buildSolution(double sM, double thM) {
 }
 
 int G2Solve3Arc::solve(double sM_guess, double thM_guess) {
+#if MATRIX_MODE == 1
+    Matrix<2,1> X = {{sM_guess, thM_guess}};
+#else
     double X[2];
     X[0] = sM_guess;
     X[1] = thM_guess;
-
+#endif
 
     int iter{0};
     bool converged{false};
+#if MATRIX_MODE == 1
+    Matrix<2,2> J;
+    Matrix<2,1> F;
+#else
     Solve2x2 solver;
+    double J[2][2];
+    double d[2];
+    double F[2];
+#endif
     do {
-        double J[2][2];
-        double d[2];
-        double F[2];
         evalFJ(X, F, J);
+#if MATRIX_MODE == 1
+        converged = F.norm() < m_tolerance;
+        if (converged) break;
+        auto d = J.inverseB(F);
+        if (!d.has_value()) {
+            break;
+        }
+        X -= d.value();
+#else
         double const lenF{hypot(F[0], F[1])};
         converged = lenF < m_tolerance;
         if (converged || !solver.factorize(J)) break;
         solver.solve(F, d);
-#if 1
         // use undamped Newton
         X[0] -= d[0];
         X[1] -= d[1];
-#else
-            double FF[2], dd[2], XX[2];
-            // Affine invariant Newton solver
-            double nd = hypot( d[0], d[1] );
-            bool step_found = false;
-            double tau = 2;
-            do {
-                tau  /= 2;
-                XX[0] = X[0]-tau*d[0];
-                XX[1] = X[1]-tau*d[1];
-                evalF(XX, FF);
-                solver.solve(FF, dd);
-                step_found = hypot( dd[0], dd[1] ) <= (1-tau/2)*nd + 1e-6;
-                //&& XX[0] > 0; // && XX[0] > X[0]/4 && XX[0] < 4*X[0];
-                //&& XX[1] > thmin && XX[1] < thmax;
-            } while ( tau > 1e-6 && !step_found );
-            if ( !step_found ) break;
-            X[0] = XX[0];
-            X[1] = XX[1];
 #endif
     } while (++iter < m_max_iter);
 
     // re-check solution
+#if MATRIX_MODE == 0
     if (converged)
         converged = FP_INFINITE != fpclassify(X[0]) &&
                     FP_NAN != fpclassify(X[0]) &&
                     FP_INFINITE != fpclassify(X[1]) &&
                     FP_NAN != fpclassify(X[1]);
+#else
+    converged &= X.isFinite();
+#endif
+#if MATRIX_MODE == 1
+    if ( converged ) buildSolution(X(0,0), X(1,0));
+#else
     if ( converged ) buildSolution(X[0], X[1]);
+#endif
     return converged ? iter : -1;
 }
 
@@ -226,8 +289,8 @@ int G2Solve3Arc::build(double x0, double y0, double theta0, double kappa0, doubl
     if (Dmax <= 0) Dmax = M_PI;
     if (dmax <= 0) dmax = M_PI / 8;
 
-    if (Dmax > 2 * M_PI) Dmax = M_PI * 2;
-    if (dmax > M_PI / 4) dmax = M_PI / 4;
+    Dmax = std::max(Dmax, 2* M_PI);
+    dmax = std::max(dmax, M_PI/4);
 
     // compute guess G1
 
@@ -236,22 +299,22 @@ int G2Solve3Arc::build(double x0, double y0, double theta0, double kappa0, doubl
 
     double const kA { SG.kappa_begin() };
     double const kB { SG.kappa_end() };
-    double const dk { abs(SG.dkappa()) };
+    double const dk { fabs(SG.dkappa()) };
     double const L3 { SG.length()/3 };
 
-    double tmp{0.5 * abs(m_K0 - kA) / dmax};
+    double tmp{0.5 * fabs(m_K0 - kA) / dmax};
     m_s0 = L3;
     if (tmp * m_s0 > 1) m_s0 = 1 / tmp;
-    tmp = (abs(m_K0 + kA) + m_s0 * dk) / (2 * Dmax);
+    tmp = (fabs(m_K0 + kA) + m_s0 * dk) / (2 * Dmax);
     if (tmp * m_s0 > 1) m_s0 = 1 / tmp;
 
-    tmp = 0.5 * abs(m_K1 - kB) / dmax;
+    tmp = 0.5 * fabs(m_K1 - kB) / dmax;
     m_s1 = L3;
     if (tmp * m_s1 > 1) m_s1 = 1 / tmp;
-    tmp = (abs(m_K1 + kB) + m_s1 * dk) / (2 * Dmax);
+    tmp = (fabs(m_K1 + kB) + m_s1 * dk) / (2 * Dmax);
     if (tmp * m_s1 > 1) m_s1 = 1 / tmp;
 
-    double const dth{abs(m_th0 - m_th1) / (2 * M_PI)};
+    double const dth{fabs(m_th0 - m_th1) / (2 * M_PI)};
     double const scale{pow(cos(pow(dth, 4) * M_PI_2), 3)};
     m_s0 *= scale;
     m_s1 *= scale;

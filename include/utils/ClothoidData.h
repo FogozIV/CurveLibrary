@@ -5,6 +5,7 @@
 #ifndef CLOTHOIDDATA_H
 #define CLOTHOIDDATA_H
 #include "Fresnel.h"
+#include "utils/Position.h"
 
 
 struct ClothoidData {
@@ -15,6 +16,8 @@ struct ClothoidData {
     double m_dk = 0;
 
 public:
+    int build_G1(Position pos0, Position pos1, double const tol, double& L);
+
     int build_G1(double const _x0, double const _y0, double const _theta0, double const x1, double const y1,
                  double const theta1, double const tol, double &L, bool compute_deriv = false, double L_D[2] = nullptr,
                  double k_D[2] = nullptr, double dk_D[2] = nullptr);

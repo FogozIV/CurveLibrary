@@ -2,7 +2,7 @@
 // Created by fogoz on 17/05/2025.
 //
 
-#include "../include/utils/ClothoidData.h"
+#include <utils/ClothoidData.h>
 
 #include <cmath>
 
@@ -29,9 +29,6 @@ int ClothoidData::build_G1(double const _x0, double const _y0, double const _the
     double const phi = atan2(dy, dx);
     double phi0 = m_theta0 - phi;
     double phi1 = theta1 - phi;
-
-    phi0 -= 2 * M_PI * round(phi0 / (2 * M_PI));
-    phi1 -= 2 * M_PI * round(phi1 / (2 * M_PI));
 
     phi0 = WARP_ANGLE(phi0);
     phi1 = WARP_ANGLE(phi1);
