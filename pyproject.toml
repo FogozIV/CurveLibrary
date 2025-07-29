@@ -1,0 +1,13 @@
+[build-system]
+requires = ["scikit-build-core[pyproject]", "pybind11", "pybind11-stubgen"]
+build-backend = "scikit_build_core.build"
+
+[project]
+name = "curve_library"
+version = "0.1.0"
+description = "Python bindings for CurveLibrary C++"
+authors = [{name = "FogozIV", email = "fogoziv@gmail.com"}]
+license = {text = "MIT"}
+dependencies = [
+    "pybind11-stubgen"
+]

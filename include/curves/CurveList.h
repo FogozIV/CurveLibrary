@@ -7,6 +7,7 @@
 #include <vector>
 #include <memory>
 #include <functional>
+#include <algorithm>
 
 class CurveList : public BaseCurve {
 private:
@@ -37,7 +38,7 @@ public:
             addCurve(curve);
         }
     }
-    size_t getCurveCount(){
+    size_t getCurveCount() const{
         return curves.size();
     }
 
