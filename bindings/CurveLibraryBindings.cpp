@@ -150,13 +150,13 @@ PYBIND11_MODULE(curve_library, m) {
             py::arg("start"), py::arg("delta_angle"), py::arg("initial_curv"), py::arg("length"))
 
         .def_static("get_from_positions",
-            [](Position start, Position end) {
+            [](Position start, Position end, double Dmax, double dmin) {
                 auto result = G2Solve3Arc();
-                if (result.build(start, end) != -1) {
+                if (result.build(start, end, Dmax, dmin) != -1) {
                     return result.getCurveList();
                 }
                 return std::make_shared<CurveList>();
-            })
+            }, py::arg("start"), py::arg("end"), py::arg("Dmax")=0.0, py::arg("dmin")=0.0)
 
         // Methods
         .def("get_position", &ClothoidCurve::getPosition)
@@ -175,7 +175,7 @@ PYBIND11_MODULE(curve_library, m) {
     py::class_<G2Solve3Arc>(m, "G2Solve3Arc")
         .def(py::init<>())
 
-        .def("build", py::overload_cast<Position, Position>(&G2Solve3Arc::build))
+        .def("build", py::overload_cast<Position, Position, double, double>(&G2Solve3Arc::build))
         .def("build_detailed",
              py::overload_cast<double,double,double,double,double,double,double,double,double,double>(
                  &G2Solve3Arc::build),

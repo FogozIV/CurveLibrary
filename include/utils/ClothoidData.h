@@ -16,7 +16,7 @@ struct ClothoidData {
     double m_dk = 0;
 
 public:
-    int build_G1(Position pos0, Position pos1, double const tol, double& L);
+    int build_G1(Position pos0, Position pos1, double const tol, double &L);
 
     int build_G1(double const _x0, double const _y0, double const _theta0, double const x1, double const y1,
                  double const theta1, double const tol, double &L, bool compute_deriv = false, double L_D[2] = nullptr,
@@ -49,6 +49,9 @@ public:
     void eval(double const s, ClothoidData &C) const;
 
     void evaluate(double const s, double &theta, double &kappa, double &x, double &y) const;
+
+    int build_G0Kappa(double const _x0, double const _y0, double const _theta0, double const _kappa0, double const x1,
+                      double const y1, double const tol, double &L, double &sigma);
 };
 
 struct ClothoidCurveV2 {
@@ -58,6 +61,9 @@ struct ClothoidCurveV2 {
 public:
     int build_G1(double const x0, double const y0, double const theta0, double const x1, double const y1,
                  double const theta1, double const tol = 1e-12);
+
+    int build_G0Kappa(double const _x0, double const _y0, double const _theta0, double const _kappa0, double const x1,
+                      double const y1, double const tol);
 
     double kappa_begin();
 

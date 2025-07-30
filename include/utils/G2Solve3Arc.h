@@ -53,7 +53,7 @@ class G2Solve3Arc {
 
 public:
 
-    int build(Position start, Position end);
+    int build(Position start, Position end, double Dmax=0, double dmin=0);
 
     int build(double x0, double y0, double theta0, double kappa0, double x1, double y1, double theta1, double kappa1,
               double Dmax = 0, double dmax = 0);

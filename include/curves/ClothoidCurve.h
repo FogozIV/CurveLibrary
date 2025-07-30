@@ -12,6 +12,8 @@
 #include "utils/G2Solve3Arc.h"
 #include "utils/Matrix.h"
 
+class ClothoidData;
+
 class ClothoidCurve : public BaseCurve {
     ClothoidCurveV2 curve;
 public:

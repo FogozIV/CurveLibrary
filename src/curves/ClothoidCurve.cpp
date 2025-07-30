@@ -22,7 +22,6 @@ ClothoidCurve::ClothoidCurve(ClothoidCurveV2 curve) : BaseCurve(0, curve.length(
     this->curve = curve;
 }
 
-
 std::shared_ptr<ClothoidCurve> ClothoidCurve::getClothoidCurve(Position start, Angle endAngle, double initialCurvature,
                                                                double length) {
     Angle delta = endAngle - start.getAngle();

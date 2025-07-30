@@ -257,9 +257,9 @@ int G2Solve3Arc::solve(double sM_guess, double thM_guess) {
 }
 
 
-int G2Solve3Arc::build(Position start, Position end) {
+int G2Solve3Arc::build(Position start, Position end, double Dmax, double dmin) {
     return build(start.getX(), start.getY(), start.getAngle().toRadians(), start.getCurvature(),
-                 end.getX(), end.getY(), end.getAngle().toRadians(), end.getCurvature());
+                 end.getX(), end.getY(), end.getAngle().toRadians(), end.getCurvature(), Dmax, dmin);
 }
 
 
