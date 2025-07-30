@@ -26,6 +26,8 @@ public:
     static std::shared_ptr<ClothoidCurve> getClothoidCurveDelta(Position start, Angle deltaAngle, double initialCurvature,
                                                                 double length);
 
+    static std::shared_ptr<ClothoidCurve> getClothoidCurveG0(Position start, double x, double y);
+
     static double getCurvatureRateAngle(Angle delta, double length, double initialCurvature);
 
     Position getPosition(double value, double h) override;

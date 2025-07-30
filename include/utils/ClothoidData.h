@@ -63,7 +63,7 @@ public:
                  double const theta1, double const tol = 1e-12);
 
     int build_G0Kappa(double const _x0, double const _y0, double const _theta0, double const _kappa0, double const x1,
-                      double const y1, double const tol);
+                      double const y1, double const tol=1e-7);
 
     double kappa_begin();
 

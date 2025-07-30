@@ -35,6 +35,13 @@ std::shared_ptr<ClothoidCurve> ClothoidCurve::getClothoidCurveDelta(Position sta
                                                                     double initialCurvature, double length) {
     return getClothoidCurve(start, start.getAngle() + deltaAngle, initialCurvature, length);
 }
+
+std::shared_ptr<ClothoidCurve> ClothoidCurve::getClothoidCurveG0(Position start, double x, double y) {
+    auto cc = ClothoidCurveV2();
+    cc.build_G0Kappa(start.getX(), start.getY(), start.getAngle().toRadians(), start.getCurvature(), x, y);
+    return std::make_shared<ClothoidCurve>(cc);
+}
+
 double ClothoidCurve::getCurvatureRateAngle(Angle delta, double length, double initialCurvature) {
     return (delta.toRadians() - initialCurvature * length) / pow(length, 2) * 2;
 }
