@@ -135,7 +135,7 @@ PYBIND11_MODULE(curve_library, m) {
     // ------------------------
     // ClothoidCurve
     // ------------------------
-    py::class_<ClothoidCurve, std::shared_ptr<ClothoidCurve>>(m, "ClothoidCurve")
+    py::class_<ClothoidCurve, BaseCurve, std::shared_ptr<ClothoidCurve>>(m, "ClothoidCurve")
         .def(py::init<Position,double,double,double>(),
              py::arg("start"), py::arg("start_curv"),
              py::arg("curvature_rate"), py::arg("length"))
@@ -148,6 +148,8 @@ PYBIND11_MODULE(curve_library, m) {
         .def_static("get_from_delta",
             &ClothoidCurve::getClothoidCurveDelta,
             py::arg("start"), py::arg("delta_angle"), py::arg("initial_curv"), py::arg("length"))
+
+        .def_static("get_from_pos_and_theta_kappa", &ClothoidCurve::getClothoidCurveG0)
 
         .def_static("get_from_positions",
             [](Position start, Position end, double Dmax, double dmin) {
