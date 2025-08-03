@@ -1,6 +1,3 @@
-//
-// Created by fogoz on 16/05/2025.
-//
 
 #include <utils/G2Solve3Arc.h>
 

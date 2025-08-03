@@ -7,6 +7,7 @@
 #include "utils/Position.h"
 #include "curves/ClothoidCurve.h"
 #include "curves/CurveList.h"
+#include "curves/HermiteSplineCurve.h"
 #include "utils/G2Solve3Arc.h"
 
 namespace py = pybind11;
@@ -220,6 +221,11 @@ PYBIND11_MODULE(curve_library, m) {
         .def("__repr__", [](const CurveList &cl) {
             return "<CurveList with " + std::to_string(cl.getCurveCount()) + " curves>";
         });
+
+    py::class_<HermiteSplineCurve<5>, std::shared_ptr<HermiteSplineCurve<5>>, BaseCurve>(m, "HermiteSplineCurve")
+        .def(py::init<std::array<Position, 6>>())
+        .def_static("build", &HermiteSplineCurve<5>::getSplineFromStartEnd, py::arg("start"), py::arg("end"), py::arg("L"))
+        .def("eval", &HermiteSplineCurve<5>::eval<3>, py::arg("s"), "Get the spline evaluation");
 
 
 }

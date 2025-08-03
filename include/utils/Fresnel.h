@@ -1,6 +1,3 @@
-//
-// Created by fogoz on 16/05/2025.
-//
 #define _USE_MATH_DEFINES
 #ifndef FRESNEL_H
 #define FRESNEL_H
