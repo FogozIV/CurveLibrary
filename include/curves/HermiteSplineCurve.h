@@ -85,5 +85,11 @@ public:
     }
 };
 
+class QuaticHermiteSpline : public HermiteSplineCurve<5> {
+public:
+    explicit QuaticHermiteSpline(const std::array<Position, 6> &pos_coeff)
+        : HermiteSplineCurve<5>(pos_coeff) {
+    }
+};
 
 #endif //HERMITESPLINECURVE_H
