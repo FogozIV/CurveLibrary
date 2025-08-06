@@ -25,6 +25,7 @@ public:
     std::array<Position, Order + 1> pos_coeff;
 
     HermiteSplineCurve(std::array<Position, Order + 1> pos_coeff) : BaseCurve(0, 1), pos_coeff(pos_coeff) {
+        this->curveType = CurveFactory::SPLINE;
     }
 
     static std::shared_ptr<HermiteSplineCurve<Order>> getSplineFromStartEnd(Position start, Position end, double L) {
@@ -38,7 +39,7 @@ public:
         pos_coeff[3] = 10 * (end - start) - 6 * s.dp - 4 * e.dp - 1.5 * s.ddp + 0.5 * e.ddp;
         pos_coeff[4] = -15 * (end - start) + 8 * s.dp + 7 * e.dp + 1.5 * s.ddp - e.ddp;
         pos_coeff[5] = 6 * (end - start) - 3 * s.dp - 3 * e.dp - 0.5 * s.ddp + 0.5 * e.ddp;
-        return std::make_shared<HermiteSplineCurve<5> >(pos_coeff);
+        return std::make_shared<HermiteSplineCurve<5> >(pos_coeff);;
     }
 
     template<size_t derivative_count>
@@ -83,6 +84,21 @@ public:
                                       pow(dx * dx + dy * dy, 3);
         return {dx, dy, Angle::fromRadians(headingDerivative), curvature_derivative};
     }
+
+    std::vector<double> getParameters() override {
+        std::vector<double> parameters = {};
+        for (auto pos : pos_coeff) {
+            parameters.emplace_back(pos.getX());
+            parameters.emplace_back(pos.getY());
+        }
+        return parameters;
+    }
+
+    std::vector<double> getFullCurve() override {
+        auto curve = BaseCurve::getFullCurve();
+        curve.insert(curve.begin() +1, static_cast<double>(Order));
+        return curve;
+    }
 };
 
 class QuinticHermiteSpline : public HermiteSplineCurve<5> {
@@ -90,6 +106,30 @@ public:
     explicit QuinticHermiteSpline(const std::array<Position, 6> &pos_coeff)
         : HermiteSplineCurve<5>(pos_coeff) {
     }
+
+    QuinticHermiteSpline(std::vector<double>& parameters) : HermiteSplineCurve<5>({}) {
+        for (size_t i = 0; i < 6; ++i) {
+            pos_coeff[i] = Position(parameters[2*i], parameters[2*i + 1]);
+        }
+        parameters.erase(parameters.begin(), parameters.begin() + 12);
+    }
+
+    static std::shared_ptr<QuinticHermiteSpline> create(const std::array<Position, 6> &pos_coeff) {
+        return std::make_shared<QuinticHermiteSpline>(pos_coeff);
+    }
+
+    static std::shared_ptr<QuinticHermiteSpline> create(Position start, Position end, double L) {
+        return std::make_shared<QuinticHermiteSpline>(QuinticHermiteSpline::getSplineFromStartEnd(start, end, L)->pos_coeff);
+    }
 };
+
+inline std::ostream& operator<<(std::ostream& os, const std::shared_ptr<QuinticHermiteSpline>& qhs) {
+    os << "Quintic Hermite Spline : ";
+    for (auto pos : qhs->pos_coeff) {
+        os << "(" << pos.getX() << ", " << pos.getY() << "), ";
+    }
+    return os;
+}
+
 
 #endif //HERMITESPLINECURVE_H

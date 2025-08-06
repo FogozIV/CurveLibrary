@@ -21,6 +21,8 @@ public:
 
     ClothoidCurve(ClothoidCurveV2 curve);
 
+    ClothoidCurve(std::vector<double>& parameters);
+
     static std::shared_ptr<ClothoidCurve> getClothoidCurve(Position start, Angle endAngle, double initialCurvature, double length);
 
     static std::shared_ptr<ClothoidCurve> getClothoidCurveDelta(Position start, Angle deltaAngle, double initialCurvature,
@@ -49,6 +51,8 @@ public:
     [[nodiscard]] double curvature_rate() const {
         return curve.m_CD.m_dk;
     }
+
+    std::vector<double> getParameters() override;
 };
 
 

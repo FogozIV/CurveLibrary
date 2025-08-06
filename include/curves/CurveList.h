@@ -9,6 +9,8 @@
 #include <functional>
 #include <algorithm>
 
+#include "CurveFactory.h"
+
 class CurveList : public BaseCurve {
 private:
     std::vector<std::shared_ptr<BaseCurve>> curves;
@@ -17,7 +19,16 @@ private:
 
 public:
     // Initialize with default min/max (updated in addCurve)
-    CurveList() : BaseCurve(0.0, 0.0) {}
+    CurveList() : BaseCurve(0.0, 0.0) {
+        this->curveType = CurveFactory::LIST;
+    }
+
+    CurveList(std::vector<double>& parameters) : BaseCurve(0.0, 0.0) {
+        this->curveType = CurveFactory::LIST;
+        while (!parameters.empty()) {
+            addCurve(CurveFactory::getBaseCurve(parameters));
+        }
+    }
 
     // Add a curve and update total arc length
     void addCurve(const std::shared_ptr<BaseCurve>& curve) {
@@ -91,6 +102,15 @@ public:
 
         double segment_start = (segment_idx == 0) ? 0.0 : segment_arc_lengths[segment_idx - 1];
         return std::pair{curves[segment_idx], arc_length - segment_start};
+    }
+
+    std::vector<double> getParameters() override {
+        std::vector<double> parameters;
+        for (auto& curve : curves) {
+            auto param = curve->getFullCurve();
+            parameters.insert(parameters.end(), param.begin(), param.end());
+        }
+        return parameters;
     }
 };
 #endif //CURVELIST_H

@@ -4,8 +4,16 @@
 
 #ifndef BASECURVE_H
 #define BASECURVE_H
+#include <cstdint>
+
 #include "utils/Integrator.h"
 #include "utils/Position.h"
+
+namespace CurveFactory {
+    enum CurveTypes {
+        BASE, ARC, BEZIER, CLOTHOID, LIST, SPLINE
+    };
+}
 
 
 class BaseCurve {
@@ -13,6 +21,7 @@ protected:
     double minValue;
     double maxValue;
     bool backward = false;
+    CurveFactory::CurveTypes curveType;
 
 public:
     virtual ~BaseCurve() = default;
@@ -36,6 +45,14 @@ public:
     double findNearest(Position pos, double h);
 
     double findNearest(Position pos, double guess, double h, int maxIter, double t_min, double t_max);
+
+    virtual std::vector<double> getParameters() = 0;
+
+    virtual std::vector<double> getFullCurve() {
+        auto params = this->getParameters();
+        params.insert(params.begin(), static_cast<double>(static_cast<uint64_t>(this->curveType)));
+        return params;
+    }
 
     virtual bool isBackward();
 

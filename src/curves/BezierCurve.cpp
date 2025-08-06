@@ -11,10 +11,21 @@
 #include <utility>
 
 BezierCurve::BezierCurve(Position pos1, Position pos2, Position pos3, Position pos4, bool reversed): BaseCurve(0, 1.0), reversed(reversed) {
-    this->pos1 = std::move(pos1);
-    this->pos2 = std::move(pos2);
-    this->pos3 = std::move(pos3);
-    this->pos4 = std::move(pos4);
+    this->curveType = CurveFactory::BEZIER;
+    this->pos1 = pos1;
+    this->pos2 = pos2;
+    this->pos3 = pos3;
+    this->pos4 = pos4;
+}
+
+BezierCurve::BezierCurve(std::vector<double>& parameters): BaseCurve(0,1.0) {
+    this->curveType = CurveFactory::BEZIER;
+    pos1= Position(parameters[0], parameters[1]);
+    pos2= Position(parameters[2], parameters[3]);
+    pos3= Position(parameters[4], parameters[5]);
+    pos4= Position(parameters[6], parameters[7]);
+    reversed = static_cast<bool>(parameters[8]);
+    parameters.erase(parameters.begin(), parameters.begin() + 9);
 }
 
 Position BezierCurve::getPosition(double value, double h) {
@@ -67,7 +78,6 @@ Position BezierCurve::getThirdDerivative(double value) {
     return 6 * (pos4- 3* pos3 + 3*pos2 - pos1);
 }
 
-#ifdef ENABLE_CURVATURE_POS
 std::shared_ptr<BezierCurve> BezierCurve::getBezierCurve(Position start, Position end, bool reversed) {
     int max_iters = 1000;
     Position pos1, pos2, pos3, pos4;
@@ -199,5 +209,8 @@ std::shared_ptr<BezierCurve> BezierCurve::getBezierCurveGridSearch(Position star
     return std::make_shared<BezierCurve>(best_pos1, best_pos2, best_pos3, pos4, reversed);
 }
 
+std::vector<double> BezierCurve::getParameters() {
+    return {this->pos1.getX(), this->pos1.getY(), this->pos2.getX(), this->pos2.getY(),this->pos3.getX(), this->pos3.getY(), this->pos4.getX(), this->pos4.getY(), static_cast<double>(reversed)};
+}
 
-#endif
+

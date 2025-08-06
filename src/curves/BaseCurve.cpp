@@ -2,9 +2,14 @@
 // Created by fogoz on 10/05/2025.
 //
 
-#include "../../include/curves/BaseCurve.h"
+#include <curves/BaseCurve.h>
+#ifndef ARDUINO
+#include <iostream>
+#endif
+
 
 BaseCurve::BaseCurve(double minValue, double maxValue) : minValue(minValue), maxValue(maxValue){
+    this->curveType = CurveFactory::BASE;
 }
 
 double BaseCurve::getMinValue() const {

@@ -11,9 +11,16 @@
 
 
 ArcCurve::ArcCurve(Position center, double radius, Angle angleStart, Angle angleEnd): BaseCurve(0, 1), center(center), radius(radius), angleStart(angleStart), angleEnd(angleEnd) {
+    this->curveType = CurveFactory::ARC;
+}
+
+ArcCurve::ArcCurve(std::vector<double>& parameters): BaseCurve(0, 1), center(parameters[0], parameters[1]), radius(parameters[2]), angleStart(Angle::fromRadians(parameters[3])), angleEnd(Angle::fromRadians(parameters[4])) {
+    this->curveType = CurveFactory::ARC;
+    parameters.erase(parameters.begin(), parameters.begin() + 5);
 }
 
 Position ArcCurve::getPosition(double value, double h) {
+
     double angle = angleStart.toRadians() + value * (angleEnd.toRadians() - angleStart.toRadians());
     double x = center.getX() + radius * cos(angle);
     double y = center.getY() + radius * sin(angle);
@@ -38,6 +45,10 @@ Position ArcCurve::getDerivative(double value) {
     double headingDerivative = curvature * speed;
 
     return Position(dx, dy, Angle::fromRadians(headingDerivative), 0.0);
+}
+
+std::vector<double> ArcCurve::getParameters() {
+    return {center.getX(), center.getY(), radius, angleStart.toRadians(), angleEnd.toRadians()};
 }
 
 std::optional<ArcCurve> getArcCurve(Position begin, Position end, bool backward) {

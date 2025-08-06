@@ -21,9 +21,13 @@ class ArcCurve : public BaseCurve{
 public:
     ArcCurve(Position center, double radius, Angle angleStart, Angle angleEnd);
 
+    ArcCurve(std::vector<double>& parameters);
+
     Position getPosition(double value, double h) override;
 
     Position getDerivative(double value) override;
+
+    std::vector<double> getParameters() override;
 };
 
 std::optional<ArcCurve> getArcCurve(Position begin, Position end);

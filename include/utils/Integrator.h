@@ -79,7 +79,7 @@ inline double runge_kutta_4_maximized(double t0, std::vector<double>& y0, double
     while (t < t_end) {
         int j = 0;
         for(int i = 0; i < n; i++){
-            if(y[i] > lookup_length[i])
+            if(y[i] >= lookup_length[i])
                 j++;
         }
         if(j == n){

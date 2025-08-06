@@ -18,6 +18,8 @@ class BezierCurve : public BaseCurve{
 public:
     BezierCurve(Position pos1, Position pos2, Position pos3, Position pos4, bool reversed=false);
 
+    explicit BezierCurve(std::vector<double>& parameters);
+
     Position getPosition(double value, double h) override;
 
     Position getDerivative(double value) override;
@@ -26,11 +28,12 @@ public:
 
     Position getThirdDerivative(double value);
 
-#ifdef ENABLE_CURVATURE_POS
+    std::vector<double> getParameters() override;
+
     static std::shared_ptr<BezierCurve> getBezierCurve(Position pos1, Position pos2, bool reversed=false);
 
     static std::shared_ptr<BezierCurve> getBezierCurveGridSearch(Position pos1, Position pos2, bool reversed=false);
-#endif
+
 };
 
 
