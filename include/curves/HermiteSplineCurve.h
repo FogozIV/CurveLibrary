@@ -123,6 +123,7 @@ public:
     }
 };
 
+#ifndef ARDUINO
 inline std::ostream& operator<<(std::ostream& os, const std::shared_ptr<QuinticHermiteSpline>& qhs) {
     os << "Quintic Hermite Spline : ";
     for (auto pos : qhs->pos_coeff) {
@@ -130,6 +131,7 @@ inline std::ostream& operator<<(std::ostream& os, const std::shared_ptr<QuinticH
     }
     return os;
 }
+#endif
 
 
 #endif //HERMITESPLINECURVE_H
