@@ -54,6 +54,10 @@ public:
         return params;
     }
 
+    virtual CurveFactory::CurveTypes getCurveType() {
+        return this->curveType;
+    }
+
     virtual bool isBackward();
 
     virtual Position getLastPosition() {

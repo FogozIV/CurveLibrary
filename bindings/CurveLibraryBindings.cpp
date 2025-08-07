@@ -50,6 +50,13 @@ public:
             getLastPosition
         );
     }
+    std::vector<double> getParameters() override {
+        PYBIND11_OVERRIDE_PURE(
+            std::vector<double>,  // Return type
+            BaseCurve,            // Parent class
+            getParameters         // Function name
+        );
+    }
 };
 PYBIND11_MODULE(curve_library, m) {
     m.doc() = "Python bindings for CurveLibrary";
@@ -132,7 +139,10 @@ PYBIND11_MODULE(curve_library, m) {
         .def("findNearestDetailed", py::overload_cast<Position,double,double,int,double,double>(&BaseCurve::findNearest),
              py::arg("pos"), py::arg("guess"), py::arg("h"), py::arg("maxIter"), py::arg("t_min"), py::arg("t_max"))
         .def("isBackward", &BaseCurve::isBackward)
-        .def("getLastPosition", &BaseCurve::getLastPosition);
+        .def("getLastPosition", &BaseCurve::getLastPosition)
+        .def("getParameters", &BaseCurve::getParameters)
+        .def("getFullCurve", &BaseCurve::getFullCurve)
+        .def("getCurveType", &BaseCurve::getCurveType);
     // ------------------------
     // ClothoidCurve
     // ------------------------
@@ -226,6 +236,16 @@ PYBIND11_MODULE(curve_library, m) {
         .def(py::init<std::array<Position, 6>>())
         .def_static("build", &HermiteSplineCurve<5>::getSplineFromStartEnd, py::arg("start"), py::arg("end"), py::arg("L"))
         .def("eval", &HermiteSplineCurve<5>::eval<3>, py::arg("s"), "Get the spline evaluation");
-
+    py::enum_<CurveFactory::CurveTypes>(m, "CurveType")
+        .value("BASE", CurveFactory::CurveTypes::BASE)
+        .value("ARC", CurveFactory::CurveTypes::ARC)
+        .value("BEZIER", CurveFactory::CurveTypes::BEZIER)
+        .value("CLOTHOID", CurveFactory::CurveTypes::CLOTHOID)
+        .value("LIST", CurveFactory::CurveTypes::LIST)
+        .value("SPLINE", CurveFactory::CurveTypes::SPLINE)
+        .export_values();
+    m.def("get_base_curve", &CurveFactory::getBaseCurve,
+      py::arg("parameters"),
+      "Construct a curve from serialized parameters");
 
 }
