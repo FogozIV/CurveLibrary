@@ -236,6 +236,31 @@ PYBIND11_MODULE(curve_library, m) {
         .def(py::init<std::array<Position, 6>>())
         .def_static("build", &HermiteSplineCurve<5>::getSplineFromStartEnd, py::arg("start"), py::arg("end"), py::arg("L"))
         .def("eval", &HermiteSplineCurve<5>::eval<3>, py::arg("s"), "Get the spline evaluation");
+
+    py::class_<QuinticHermiteSpline, HermiteSplineCurve<5>, std::shared_ptr<QuinticHermiteSpline>>(m, "QuinticHermiteSpline")
+    .def(py::init<std::vector<double>&>(), py::arg("parameters"))
+
+    // Disambiguated overload: create(pos_coeff: array[6])
+    .def_static("create",
+                py::overload_cast<const std::array<Position, 6>&>(&QuinticHermiteSpline::create),
+                py::arg("pos_coeff"))
+
+    // Disambiguated overload: create(start: Position, end: Position, L: float)
+    .def_static("build",
+                py::overload_cast<Position, Position, double>(&QuinticHermiteSpline::create),
+                py::arg("start"), py::arg("end"), py::arg("L"))
+
+    .def("get_position", &QuinticHermiteSpline::getPosition, py::arg("s"), py::arg("h") = 0.01)
+    .def("get_derivative", &QuinticHermiteSpline::getDerivative, py::arg("s"))
+
+    .def("__repr__", [](const QuinticHermiteSpline &qhs) {
+        std::ostringstream oss;
+        oss << "QuinticHermiteSpline[";
+        for (const auto &pos : qhs.pos_coeff)
+            oss << "(" << pos.getX() << ", " << pos.getY() << "), ";
+        oss << "]";
+        return oss.str();
+    });
     py::enum_<CurveFactory::CurveTypes>(m, "CurveType")
         .value("BASE", CurveFactory::CurveTypes::BASE)
         .value("ARC", CurveFactory::CurveTypes::ARC)
@@ -247,5 +272,6 @@ PYBIND11_MODULE(curve_library, m) {
     m.def("get_base_curve", &CurveFactory::getBaseCurve,
       py::arg("parameters"),
       "Construct a curve from serialized parameters");
+
 
 }
