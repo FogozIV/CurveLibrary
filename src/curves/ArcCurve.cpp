@@ -14,20 +14,29 @@ ArcCurve::ArcCurve(Position center, double radius, Angle angleStart, Angle angle
     this->curveType = CurveFactory::ARC;
 }
 
+ArcCurve::ArcCurve(Position begin, double radius, Angle angleEnd) : BaseCurve(0,1), angleStart(begin.getAngle()), angleEnd(angleEnd), radius(radius) {
+    this->curveType = CurveFactory::ARC;
+    double sign = (angleEnd - begin.getAngle()).warpAngle().toRadians() > 0 ? 1 : -1;
+    center = begin + sign * radius * begin.getNormalVector();
+    std::cout << "center: " << center << std::endl;
+    std::cout << "radius: " << radius << std::endl;
+    std::cout << "sign: " << sign << std::endl;
+    this->radius = abs(radius) * sign;
+}
+
 ArcCurve::ArcCurve(std::vector<double>& parameters): BaseCurve(0, 1), center(parameters[0], parameters[1]), radius(parameters[2]), angleStart(Angle::fromRadians(parameters[3])), angleEnd(Angle::fromRadians(parameters[4])) {
     this->curveType = CurveFactory::ARC;
     parameters.erase(parameters.begin(), parameters.begin() + 5);
 }
 
 Position ArcCurve::getPosition(double value, double h) {
-
     double angle = angleStart.toRadians() + value * (angleEnd.toRadians() - angleStart.toRadians());
-    double x = center.getX() + radius * cos(angle);
-    double y = center.getY() + radius * sin(angle);
+    double x = center.getX() + radius * cos(angle-M_PI_2);
+    double y = center.getY() + radius * sin(angle - M_PI_2);
     double diff = (angleEnd - angleStart).warpAngle().toDegrees();
     bool isCCW = diff > 0;
-    double orientation = angle + (isCCW ? M_PI/2 : -M_PI/2);
-    return Position(x, y, Angle::fromRadians(orientation), 1/radius);
+    double orientation = angle;
+    return {x, y, Angle::fromRadians(orientation), 1/radius};
 }
 
 Position ArcCurve::getDerivative(double value) {
