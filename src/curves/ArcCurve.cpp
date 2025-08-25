@@ -18,9 +18,11 @@ ArcCurve::ArcCurve(Position begin, double radius, Angle angleEnd) : BaseCurve(0,
     this->curveType = CurveFactory::ARC;
     double sign = (angleEnd - begin.getAngle()).warpAngle().toRadians() > 0 ? 1 : -1;
     center = begin + sign * radius * begin.getNormalVector();
+#ifndef ARDUINO
     std::cout << "center: " << center << std::endl;
     std::cout << "radius: " << radius << std::endl;
     std::cout << "sign: " << sign << std::endl;
+#endif
     this->radius = abs(radius) * sign;
 }
 
