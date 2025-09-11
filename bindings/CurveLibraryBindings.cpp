@@ -106,6 +106,7 @@ PYBIND11_MODULE(curve_library, m) {
         .def("get_xyradcurv", &Position::getXYRadCurv)
         .def("get_distance", &Position::getDistance)
         .def("get_vector_angle", &Position::getVectorAngle)
+        .def("get_offset_relative", py::overload_cast<Position>(&Position::offsetRelative, py::const_), py::arg("position"))
 
         // Operators
         .def(py::self + py::self)
